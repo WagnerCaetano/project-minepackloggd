@@ -1,0 +1,30 @@
+.google-auth-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #4285f4;
+  color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.google-auth-button:hover {
+  background-color: #3367d6;
+}
+
+.google-auth-button:active {
+  transform: scale(0.98);
+}
+
+.google-auth-button--authenticated {
+  background-color: #374151;
+}
+
+.google-auth-button--authenticated:hover {
+  background-color: #4b5563;
+}

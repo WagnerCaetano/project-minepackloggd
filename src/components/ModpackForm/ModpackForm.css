@@ -1,0 +1,221 @@
+.modpack-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modpack-form {
+  background-color: #1f2937;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.5);
+}
+
+.modpack-form__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #374151;
+}
+
+.modpack-form__header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #f3f4f6;
+}
+
+.modpack-form__close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 32px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.modpack-form__close:hover {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+.modpack-form__mode-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 16px 20px 0;
+}
+
+.modpack-form__mode-button {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: #374151;
+  color: #9ca3af;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.modpack-form__mode-button:hover {
+  background-color: #4b5563;
+  color: #d1d5db;
+}
+
+.modpack-form__mode-button.active {
+  background-color: #3b82f6;
+  color: #f3f4f6;
+}
+
+.modpack-form__error {
+  margin: 16px 20px;
+  padding: 12px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 14px;
+}
+
+.modpack-form__curseforge,
+.modpack-form__manual {
+  padding: 20px;
+}
+
+.modpack-form__field {
+  margin-bottom: 20px;
+}
+
+.modpack-form__field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #d1d5db;
+}
+
+.modpack-form__input,
+.modpack-form__textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: #374151;
+  color: #f3f4f6;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.modpack-form__input::placeholder,
+.modpack-form__textarea::placeholder {
+  color: #6b7280;
+}
+
+.modpack-form__input:hover,
+.modpack-form__textarea:hover {
+  border-color: #6b7280;
+}
+
+.modpack-form__input:focus,
+.modpack-form__textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modpack-form__textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modpack-form__hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.modpack-form__hint a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.modpack-form__hint a:hover {
+  text-decoration: underline;
+}
+
+.modpack-form__fetch-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3b82f6;
+  color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modpack-form__fetch-button:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.modpack-form__fetch-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modpack-form__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modpack-form__button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modpack-form__button--cancel {
+  background-color: #374151;
+  color: #d1d5db;
+}
+
+.modpack-form__button--cancel:hover {
+  background-color: #4b5563;
+}
+
+.modpack-form__button--submit {
+  background-color: #10b981;
+  color: #f3f4f6;
+}
+
+.modpack-form__button--submit:hover {
+  background-color: #059669;
+}

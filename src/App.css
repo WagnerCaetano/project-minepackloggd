@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #111827;
+  color: #f3f4f6;
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__header {
+  background-color: #1f2937;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.app__title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #f3f4f6;
+}
+
+.app__stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.app__stat {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.app__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px;
+  align-items: center;
+}
+
+.app__button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.app__button:active {
+  transform: scale(0.98);
+}
+
+.app__button--primary {
+  background-color: #10b981;
+  color: #f3f4f6;
+}
+
+.app__button--primary:hover {
+  background-color: #059669;
+}
+
+.app__button--sync {
+  background-color: #4285f4;
+  color: #f3f4f6;
+}
+
+.app__button--sync:hover:not(:disabled) {
+  background-color: #3367d6;
+}
+
+.app__button--sync:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app__button--load {
+  background-color: #8b5cf6;
+  color: #f3f4f6;
+}
+
+.app__button--load:hover:not(:disabled) {
+  background-color: #7c3aed;
+}
+
+.app__button--load:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app__sync {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.app__error {
+  margin: 0 20px;
+  padding: 12px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 14px;
+}
+
+.app__main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.app__footer {
+  background-color: #1f2937;
+  padding: 16px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .app__header {
+    padding: 16px;
+  }
+
+  .app__title {
+    font-size: 24px;
+  }
+
+  .app__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app__sync {
+    margin-left: 0;
+    flex-direction: column;
+  }
+
+  .app__button {
+    width: 100%;
+  }
+}

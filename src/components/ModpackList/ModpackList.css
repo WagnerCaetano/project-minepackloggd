@@ -1,0 +1,29 @@
+.modpack-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.modpack-list--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.modpack-list__empty {
+  text-align: center;
+  color: #9ca3af;
+}
+
+.modpack-list__empty h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: #d1d5db;
+}
+
+.modpack-list__empty p {
+  margin: 0;
+  font-size: 16px;
+}
