@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Modpack, ModpackStatus } from '../types';
 import { storageService } from '../services/storageService';
-import { googleDriveService } from '../services/googleDriveService';
 
 interface ModpackContextType {
   modpacks: Modpack[];
@@ -11,9 +10,6 @@ interface ModpackContextType {
   updateModpackStatus: (id: string, status: ModpackStatus) => void;
   isLoading: boolean;
   error: string | null;
-  syncToDrive: () => Promise<void>;
-  loadFromDrive: () => Promise<void>;
-  isAuthenticated: boolean;
 }
 
 const ModpackContext = createContext<ModpackContextType | undefined>(undefined);
@@ -27,16 +23,16 @@ export const useModpacks = () => {
 };
 
 interface ModpackProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const ModpackProvider: React.FC<ModpackProviderProps> = ({ children }) => {
   const [modpacks, setModpacks] = useState<Modpack[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load modpacks from localStorage on mount
-  React.useEffect(() => {
+  useEffect(() => {
     const loadData = () => {
       try {
         const data = storageService.loadAppData();
@@ -56,7 +52,6 @@ export const ModpackProvider: React.FC<ModpackProviderProps> = ({ children }) =>
       try {
         storageService.saveAppData({
           modpacks,
-          syncSource: googleDriveService.isAuthenticated() ? 'gdrive' : 'local',
         });
       } catch (err) {
         setError('Failed to save data');
@@ -96,54 +91,14 @@ export const ModpackProvider: React.FC<ModpackProviderProps> = ({ children }) =>
   }, []);
 
   const updateModpackStatus = useCallback((id: string, status: ModpackStatus) => {
-    updateModpack(id, { status });
-  }, [updateModpack]);
-
-  const syncToDrive = useCallback(async () => {
-    if (!googleDriveService.isAuthenticated()) {
-      setError('Not authenticated with Google Drive');
-      return;
-    }
-
-    setIsLoading(true);
+    setModpacks((prev) =>
+      prev.map((modpack) =>
+        modpack.id === id
+          ? { ...modpack, status, updatedAt: new Date() }
+          : modpack
+      )
+    );
     setError(null);
-
-    try {
-      await googleDriveService.saveToDrive({
-        modpacks,
-        syncSource: 'gdrive',
-        lastSync: new Date(),
-      });
-    } catch (err) {
-      setError('Failed to sync to Google Drive');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [modpacks]);
-
-  const loadFromDrive = useCallback(async () => {
-    if (!googleDriveService.isAuthenticated()) {
-      setError('Not authenticated with Google Drive');
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const data = await googleDriveService.loadFromDrive();
-      if (data) {
-        setModpacks(data.modpacks);
-      } else {
-        setError('No data found on Google Drive');
-      }
-    } catch (err) {
-      setError('Failed to load from Google Drive');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
   }, []);
 
   const value: ModpackContextType = {
@@ -154,9 +109,6 @@ export const ModpackProvider: React.FC<ModpackProviderProps> = ({ children }) =>
     updateModpackStatus,
     isLoading,
     error,
-    syncToDrive,
-    loadFromDrive,
-    isAuthenticated: googleDriveService.isAuthenticated(),
   };
 
   return <ModpackContext.Provider value={value}>{children}</ModpackContext.Provider>;

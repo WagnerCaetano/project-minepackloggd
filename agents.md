@@ -2,17 +2,16 @@
 
 ## Project Overview
 
-A web application for tracking Minecraft modpacks with support for Google Drive sync, local browser caching, and CurseForge integration.
+A web application for tracking Minecraft modpacks with local browser storage.
 
 **Tech Stack:**
-- Frontend: React 18 with TypeScript
+- Frontend: React 19 with TypeScript
 - Build Tool: Vite
 - Styling: CSS
 - State Management: React Context API
-- Storage: localStorage, IndexedDB, Google Drive API
-- External APIs: CurseForge (via HTML scraping)
+- Storage: localStorage
 
-**Project URL:** `c:/Users/Wagner Caetano/git/minecraft-modpack-aggregator`
+**Project URL:** `c:/Users/Wagner Caetano/git/project-minepackloggd`
 
 ---
 
@@ -23,34 +22,24 @@ A web application for tracking Minecraft modpacks with support for Google Drive 
 ```
 src/
 ├── components/
-│   ├── Auth/                    # Google Drive authentication
-│   │   ├── GoogleAuthButton.tsx   # One-click auth UI
-│   │   └── GoogleAuthButton.css
 │   ├── ModpackCard/            # Individual modpack display
 │   │   ├── ModpackCard.tsx
 │   │   ├── ModpackCard.css
 │   │   └── index.ts
 │   ├── ModpackForm/            # Add/edit form
-│   │   ├── ModpackForm.tsx        # CurseForge URL + Manual Entry
+│   │   ├── ModpackForm.tsx
 │   │   ├── ModpackForm.css
 │   │   └── index.ts
-│   ├── ModpackList/            # Grid of modpacks
-│   │   ├── ModpackList.tsx
-│   │   ├── ModpackList.css
-│   │   └── index.ts
-│   └── Sync/                   # Import/Export functionality
-│       ├── ImportExport.tsx
-│       ├── ImportExport.css
+│   └── ModpackList/            # Grid of modpacks
+│       ├── ModpackList.tsx
+│       ├── ModpackList.css
 │       └── index.ts
 ├── contexts/
 │   └── ModpackContext.tsx      # Global state management
 ├── services/
-│   ├── storageService.ts        # localStorage + IndexedDB
-│   ├── curseForgeScraper.ts    # HTML parser for CurseForge
-│   └── googleDriveService.ts     # Google Drive API wrapper
+│   └── storageService.ts        # localStorage operations
 ├── types/
-│   ├── index.ts                 # Main type definitions
-│   └── vite-env.d.ts            # Vite + Google types
+│   └── index.ts                 # Main type definitions
 ├── App.tsx                     # Main app component
 ├── App.css                      # Global styles
 └── main.tsx                     # Entry point
@@ -59,7 +48,7 @@ src/
 ### Data Flow
 
 ```
-User Input → ModpackForm → ModpackContext → Storage Service → localStorage/IndexedDB/Google Drive
+User Input → ModpackForm → ModpackContext → Storage Service → localStorage
                                                     ↓
                                               ModpackList Display
 ```
@@ -71,135 +60,60 @@ User Input → ModpackForm → ModpackContext → Storage Service → localStora
 ### Core Features
 
 1. **Modpack Management**
-   - Add modpacks via CurseForge URL or manual entry
+   - Add modpacks via manual entry
    - Edit existing modpacks
    - Delete modpacks with confirmation
    - Track status: Not Played, In Progress, Completed
 
-2. **CurseForge Integration** (HTML Scraping)
-    - Paste CurseForge URL to auto-fetch modpack data
-    - Extracts: name, description, image URL, versions
-    - Uses Vercel serverless function to bypass CORS
-    - Rate limiting: 10 requests/minute per IP
-    - Caching: 1 hour cache per URL
-
-3. **Storage Options**
-   - **Local Storage**: Automatic save to localStorage
-   - **IndexedDB**: Image caching for better performance
-   - **Google Drive**: Cloud backup and sync
-   - **Import/Export**: JSON file backup
-
-4. **Google Drive Integration** (Simplified)
-    - One-click authorization using Google Identity Services
-    - Simple save/load file from Google Drive
-    - Token stored in sessionStorage
-    - No complex OAuth flow needed
+2. **Local Storage**
+   - Automatic save to localStorage
+   - Debounced saving (500ms) to optimize performance
+   - Data persists between browser sessions
 
 ---
 
 ## Implementation Details
-
-### CurseForge HTML Scraping
-
-**File:** [`src/services/curseForgeScraper.ts`](src/services/curseForgeScraper.ts)
-
-**How it works:**
-1. User pastes CurseForge URL
-2. App calls Vercel serverless function
-3. Function fetches HTML from CurseForge (bypasses CORS)
-4. Parses HTML using DOMParser API
-5. Extracts data from meta tags and page elements
-
-**Data Extraction:**
-```typescript
-// Extract name from multiple sources
-const name = 
-  doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
-  doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') ||
-  doc.querySelector('h1')?.textContent?.trim() ||
-  doc.querySelector('title')?.textContent?.trim() ||
-  'Unknown Modpack';
-
-// Extract description
-const description = 
-  doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
-  doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') ||
-  doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
-  '';
-
-// Extract image
-const imageUrl = 
-  doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
-  doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') ||
-  '';
-```
-
-**Serverless Function:** [`api/curseforge-proxy.js`](api/curseforge-proxy.js)
-
-**Features:**
-- Rate limiting: 10 requests/minute per IP
-- Caching: 1 hour TTL per URL
-- CORS headers enabled
-- URL validation (only CurseForge URLs allowed)
-- User-Agent header for proper scraping
-
-### Google Drive Integration
-
-**File:** [`src/services/googleDriveService.ts`](src/services/googleDriveService.ts)
-
-**How it works:**
-1. User clicks "Connect Google Drive"
-2. Google Identity Services popup appears
-3. User authorizes with one click
-4. Token stored in sessionStorage
-5. Use token for Drive API operations
-
-**Google Identity Services:**
-```typescript
-// Initialize token client
-tokenClient = google.accounts.oauth2.initTokenClient({
-  client_id: OAUTH2_CLIENT_ID,
-  scope: OAUTH2_SCOPE,
-  callback: (response: any) => {
-    if (response.access_token) {
-      setAccessToken(response.access_token);
-    }
-  },
-});
-
-// One-click auth
-const requestAccessToken = () => {
-  tokenClient.requestAccessToken();
-};
-```
-
-**File Operations:**
-- Save data to Drive (create or update)
-- Load data from Drive
-- Find existing data file
-- Create app data folder if needed
 
 ### Storage Service
 
 **File:** [`src/services/storageService.ts`](src/services/storageService.ts)
 
 **Features:**
-- localStorage for app data (modpacks, settings)
-- IndexedDB for image caching
-- JSON export functionality
-- JSON import functionality
+- localStorage for app data (modpacks)
+- IndexedDB for image caching (optional, for future use)
 - Date serialization/deserialization
+- JSON export/import functionality
 
-**IndexedDB Structure:**
+**Functions:**
 ```typescript
-const IMAGE_DB_NAME = 'modpack-tracker-images';
-const IMAGE_DB_VERSION = 1;
-const IMAGE_STORE = 'images';
+loadAppData(): AppData          // Load modpacks from localStorage
+saveAppData(data: AppData): void // Save modpacks to localStorage
+exportData(data: AppData): string // Export to JSON string
+importData(jsonString: string): AppData // Import from JSON string
+```
 
-// Store images by modpack ID
-saveImage(key: string, dataUrl: string): Promise<void>
-getImage(key: string): Promise<string | undefined>
-deleteImage(key: string): Promise<void>
+### Modpack Context
+
+**File:** [`src/contexts/ModpackContext.tsx`](src/contexts/ModpackContext.tsx)
+
+**Features:**
+- Global state management for modpacks
+- Auto-load from localStorage on mount
+- Auto-save to localStorage on changes (debounced)
+- CRUD operations for modpacks
+- Error handling and loading states
+
+**Context Interface:**
+```typescript
+interface ModpackContextType {
+  modpacks: Modpack[];
+  addModpack: (modpack: Omit<Modpack, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateModpack: (id: string, updates: Partial<Modpack>) => void;
+  deleteModpack: (id: string) => void;
+  updateModpackStatus: (id: string, status: ModpackStatus) => void;
+  isLoading: boolean;
+  error: string | null;
+}
 ```
 
 ---
@@ -210,7 +124,7 @@ deleteImage(key: string): Promise<void>
 
 | File | Purpose |
 |-------|----------|
-| [`index.html`](index.html) | HTML entry point, includes Google Identity Services script |
+| [`index.html`](index.html) | HTML entry point |
 | [`src/main.tsx`](src/main.tsx) | React app mount point |
 | [`src/App.tsx`](src/App.tsx) | Main app component with routing and state |
 | [`src/App.css`](src/App.css) | Global styles and responsive design |
@@ -224,18 +138,13 @@ deleteImage(key: string): Promise<void>
 |-------|----------|
 | [`src/components/ModpackCard/ModpackCard.tsx`](src/components/ModpackCard/ModpackCard.tsx) | Display individual modpack with status, edit, delete |
 | [`src/components/ModpackList/ModpackList.tsx`](src/components/ModpackList/ModpackList.tsx) | Grid display of all modpacks |
-| [`src/components/ModpackForm/ModpackForm.tsx`](src/components/ModpackForm/ModpackForm.tsx) | Add/edit form with CurseForge URL input |
-| [`src/components/Auth/GoogleAuthButton.tsx`](src/components/Auth/GoogleAuthButton.tsx) | One-click Google Drive auth button |
-| [`src/components/Sync/ImportExport.tsx`](src/components/Sync/ImportExport.tsx) | JSON import/export functionality |
+| [`src/components/ModpackForm/ModpackForm.tsx`](src/components/ModpackForm/ModpackForm.tsx) | Add/edit form with manual entry |
 
 ### Service Files
 
 | File | Purpose |
 |-------|----------|
 | [`src/services/storageService.ts`](src/services/storageService.ts) | localStorage and IndexedDB operations |
-| [`src/services/curseForgeScraper.ts`](src/services/curseForgeScraper.ts) | CurseForge HTML parser |
-| [`src/services/googleDriveService.ts`](src/services/googleDriveService.ts) | Google Drive API wrapper |
-| [`src/services/curseForgeService.ts`](src/services/curseForgeService.ts) | Legacy CurseForge API (deprecated) |
 
 ### Context Files
 
@@ -248,54 +157,28 @@ deleteImage(key: string): Promise<void>
 | File | Purpose |
 |-------|----------|
 | [`src/types/index.ts`](src/types/index.ts) | TypeScript interfaces for app data |
-| [`src/vite-env.d.ts`](src/vite-env.d.ts) | Vite and Google Identity Services types |
-
-### Serverless Functions
-
-| File | Purpose |
-|-------|----------|
-| [`api/curseforge-proxy.js`](api/curseforge-proxy.js) | CurseForge HTML proxy with rate limiting |
+| [`src/vite-env.d.ts`](src/vite-env.d.ts) | Vite type definitions |
 
 ### Documentation Files
 
 | File | Purpose |
 |-------|----------|
 | [`README.md`](README.md) | User guide and setup instructions |
-| [`IMPLEMENTATION_SUMMARY.md`](IMPLEMENTATION_SUMMARY.md) | Implementation details and deployment guide |
-| [`plans/modpack-tracker-architecture.md`](plans/modpack-tracker-architecture.md) | Original architecture plan |
-| [`plans/curseforge-scraping-plan.md`](plans/curseforge-scraping-plan.md) | CurseForge scraping plan |
+| [`agents.md`](agents.md) | This file - Agent documentation |
 
 ### Configuration Files
 
 | File | Purpose |
 |-------|----------|
-| [`.env.example`](.env.example) | Environment variable template |
 | [`.gitignore`](.gitignore) | Git ignore rules |
 
 ---
 
-## Deployment Instructions
+## Development Instructions
 
 ### Prerequisites
 
 1. Node.js 18+ and npm
-2. Google Cloud Console account (for Google Drive)
-3. Vercel or Netlify account (for CurseForge scraping)
-
-### Environment Setup
-
-Create `.env` file:
-```env
-VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
-```
-
-Get Google Client ID:
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Navigate to APIs & Services > Credentials
-4. Create OAuth 2.0 Client ID (Web application)
-5. Add your app's URL to Authorized JavaScript origins
-6. Copy the Client ID
 
 ### Local Development
 
@@ -306,72 +189,13 @@ npm run dev
 
 App will be available at `http://localhost:3000`
 
-### Production Deployment
+### Production Build
 
-#### Option 1: Vercel (Recommended)
-
-1. Create `vercel.json`:
-```json
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  }
-}
-```
-
-2. Deploy:
 ```bash
-npm install -g vercel
-vercel
+npm run build
 ```
 
-3. The serverless function will be automatically deployed to `/api/curseforge-proxy`
-
-#### Option 2: Netlify
-
-1. Create `netlify.toml`:
-```toml
-[functions]
-  directory = "api"
-```
-
-2. Deploy:
-```bash
-npm install -g netlify-cli
-netlify deploy --prod
-```
-
----
-
-## Known Issues and Solutions
-
-### Issue 1: CurseForge API Returns 403 Forbidden
-
-**Cause:** Invalid or missing API key
-
-**Solution:** Use HTML scraping instead (implemented)
-
-### Issue 2: CORS Errors When Fetching CurseForge
-
-**Cause:** Browser blocks cross-origin requests
-
-**Solution:** Use Vercel/Netlify serverless function (implemented)
-
-### Issue 3: TypeScript Errors for Google Types
-
-**Cause:** Missing type definitions for Google Identity Services
-
-**Solution:** Created [`src/vite-env.d.ts`](src/vite-env.d.ts) with proper type declarations
-
-### Issue 4: Rate Limiting Concerns
-
-**Cause:** Potential abuse of CurseForge proxy
-
-**Solution:** Implemented rate limiting (10 req/min per IP) and caching (1 hour TTL)
+The built files will be in the `dist` directory.
 
 ---
 
@@ -386,8 +210,6 @@ interface Modpack {
   version: string;
   description: string;
   imageUrl: string;
-  curseForgeUrl?: string;
-  curseForgeId?: string;
   status: ModpackStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -401,8 +223,6 @@ type ModpackStatus = 'not-played' | 'in-progress' | 'completed';
 ```typescript
 interface AppData {
   modpacks: Modpack[];
-  lastSync?: Date;
-  syncSource: 'local' | 'gdrive';
 }
 ```
 
@@ -441,15 +261,10 @@ interface AppData {
    - Restore from specific date
    - Compare changes between versions
 
-7. **Multi-User Support**
-   - Separate modpack lists per user
-   - Shared modpacks
-   - Collaborative tracking
-
-8. **Advanced CurseForge Features**
-   - Fetch modpack changelog
-   - Show latest version updates
-   - Download button for modpack files
+7. **Import/Export Improvements**
+   - Export to CSV
+   - Import from CSV
+   - Multiple backup slots
 
 ---
 
@@ -489,36 +304,24 @@ npx tsc --noEmit
    - React's built-in escaping
    - No dangerouslySetInnerHTML used
 
-2. **CORS**
-   - Serverless function validates URLs
-   - Only CurseForge URLs allowed
-
-3. **Rate Limiting**
-   - Prevents abuse of CurseForge proxy
-   - Per-IP limits implemented
-
-4. **Data Privacy**
+2. **Data Privacy**
    - All data stored client-side
    - No server-side data collection
-   - Google Drive uses user's own account
+   - No external API calls
 
 ---
 
 ## Performance Optimizations
 
-1. **Image Caching**
-   - IndexedDB stores images locally
-   - Reduces external requests
+1. **Debounced Saving**
+   - 500ms debounce on localStorage writes
+   - Reduces write operations
 
-2. **HTML Caching**
-   - CurseForge pages cached for 1 hour
-   - Reduces serverless function calls
-
-3. **Code Splitting**
+2. **Code Splitting**
    - Vite automatically splits code
    - Faster initial load times
 
-4. **Lazy Loading**
+3. **Lazy Loading**
    - Components load on demand
    - Better perceived performance
 
@@ -526,27 +329,15 @@ npx tsc --noEmit
 
 ## Troubleshooting
 
-### CurseForge Scraping Not Working
+### Data Not Persisting
 
-**Symptoms:** "Failed to fetch modpack data" error
-
-**Solutions:**
-1. Ensure app is deployed to Vercel/Netlify
-2. Check browser console for specific errors
-3. Verify CurseForge URL is correct
-4. Check rate limit (wait 1 minute if exceeded)
-5. Try manual entry as fallback
-
-### Google Drive Not Working
-
-**Symptoms:** "Not authenticated" error
+**Symptoms:** Modpacks disappear after browser refresh
 
 **Solutions:**
-1. Check VITE_GOOGLE_CLIENT_ID in .env
-2. Verify Client ID is correct
-3. Check Google Cloud Console for authorized origins
-4. Ensure popup is not blocked
-5. Try disconnecting and reconnecting
+1. Check browser localStorage is enabled
+2. Check browser console for errors
+3. Verify storage quota is not exceeded
+4. Try clearing browser cache and re-adding data
 
 ### Build Errors
 
@@ -564,17 +355,24 @@ npx tsc --noEmit
 
 For issues or questions:
 1. Check [README.md](README.md) for basic setup
-2. Review [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) for deployment details
-3. Check browser console for error messages
-4. Verify environment variables are set correctly
+2. Check browser console for error messages
+3. Verify Node.js and npm versions
 
 ---
 
 ## Version History
 
-### v1.0.0 (Current)
+### v2.0.0 (Current)
+- Removed CurseForge integration
+- Removed Google Drive integration
+- Simplified to local-only storage
+- Updated to React 19
+- Removed unnecessary dependencies (axios)
+- Removed serverless function requirements
+
+### v1.0.0
 - Initial implementation with React + Vite
 - CurseForge HTML scraping with rate limiting
-- Simplified Google Drive integration
+- Google Drive integration
 - Local storage + IndexedDB
 - Import/Export functionality

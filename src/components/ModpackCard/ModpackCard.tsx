@@ -45,16 +45,6 @@ export const ModpackCard: React.FC<ModpackCardProps> = ({
         <h3 className="modpack-card__name">{modpack.name}</h3>
         <p className="modpack-card__version">Version: {modpack.version}</p>
         <p className="modpack-card__description">{modpack.description}</p>
-        {modpack.curseForgeUrl && (
-          <a
-            href={modpack.curseForgeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="modpack-card__link"
-          >
-            View on CurseForge
-          </a>
-        )}
       </div>
       <div className="modpack-card__actions">
         <select

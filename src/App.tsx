@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 import { ModpackProvider, useModpacks } from './contexts/ModpackContext';
 import { ModpackList } from './components/ModpackList';
 import { ModpackForm } from './components/ModpackForm';
-import { GoogleAuthButton } from './components/Auth';
-import { ImportExport } from './components/Sync';
 import { Modpack } from './types';
 import './App.css';
 
 const AppContent: React.FC = () => {
-  const { modpacks, addModpack, updateModpack, deleteModpack, updateModpackStatus, isLoading, error, syncToDrive, loadFromDrive } = useModpacks();
+  const { modpacks, addModpack, updateModpack, deleteModpack, updateModpackStatus, error } = useModpacks();
   const [showForm, setShowForm] = useState(false);
   const [editingModpack, setEditingModpack] = useState<Modpack | undefined>();
-  const [authStatus, setAuthStatus] = useState(false);
 
   const handleAddModpack = () => {
     setEditingModpack(undefined);
@@ -65,20 +62,6 @@ const AppContent: React.FC = () => {
         <button onClick={handleAddModpack} className="app__button app__button--primary">
           + Add Modpack
         </button>
-        <div className="app__sync">
-          <GoogleAuthButton onAuthChange={setAuthStatus} />
-          {authStatus && (
-            <>
-              <button onClick={syncToDrive} disabled={isLoading} className="app__button app__button--sync">
-                {isLoading ? 'Syncing...' : 'Sync to Drive'}
-              </button>
-              <button onClick={loadFromDrive} disabled={isLoading} className="app__button app__button--load">
-                {isLoading ? 'Loading...' : 'Load from Drive'}
-              </button>
-            </>
-          )}
-          <ImportExport />
-        </div>
       </div>
 
       {error && <div className="app__error">{error}</div>}

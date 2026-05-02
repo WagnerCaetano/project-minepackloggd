@@ -1,16 +1,9 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_GOOGLE_CLIENT_ID: string;
+  // Add any environment variables here if needed in the future
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
-}
-
-// Type definitions for Google Identity Services
-declare global {
-  interface Window {
-    google: any;
-  }
 }

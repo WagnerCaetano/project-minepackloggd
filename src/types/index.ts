@@ -6,8 +6,6 @@ export interface Modpack {
   version: string;
   description: string;
   imageUrl: string;
-  curseForgeUrl?: string;
-  curseForgeId?: string;
   status: ModpackStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -15,6 +13,4 @@ export interface Modpack {
 
 export interface AppData {
   modpacks: Modpack[];
-  lastSync?: Date;
-  syncSource: 'local' | 'gdrive';
 }

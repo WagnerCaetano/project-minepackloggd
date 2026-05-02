@@ -80,7 +80,6 @@ const loadAppData = (): AppData => {
   }
   return {
     modpacks: [],
-    syncSource: 'local',
   };
 };
 
