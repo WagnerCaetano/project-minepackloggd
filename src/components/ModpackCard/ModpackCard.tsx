@@ -45,6 +45,13 @@ export const ModpackCard: React.FC<ModpackCardProps> = ({
         <h3 className="modpack-card__name">{modpack.name}</h3>
         <p className="modpack-card__version">Version: {modpack.version}</p>
         <p className="modpack-card__description">{modpack.description}</p>
+        {modpack.categories.length > 0 && (
+          <div className="modpack-card__categories">
+            {modpack.categories.map((cat) => (
+              <span key={cat} className="modpack-card__category-tag">{cat}</span>
+            ))}
+          </div>
+        )}
       </div>
       <div className="modpack-card__actions">
         <select

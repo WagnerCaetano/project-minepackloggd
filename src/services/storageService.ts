@@ -67,6 +67,7 @@ const loadAppData = (): AppData => {
       // Convert date strings back to Date objects
       parsed.modpacks = parsed.modpacks.map((m: Modpack) => ({
         ...m,
+        categories: m.categories || [],
         createdAt: new Date(m.createdAt),
         updatedAt: new Date(m.updatedAt),
       }));
@@ -99,6 +100,7 @@ const importData = (jsonString: string): AppData => {
   const parsed = JSON.parse(jsonString);
   parsed.modpacks = parsed.modpacks.map((m: Modpack) => ({
     ...m,
+    categories: m.categories || [],
     createdAt: new Date(m.createdAt),
     updatedAt: new Date(m.updatedAt),
   }));
