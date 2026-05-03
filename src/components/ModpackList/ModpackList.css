@@ -1,8 +1,12 @@
+.modpack-list-wrapper {
+  padding: 20px;
+}
+
 .modpack-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-  padding: 20px;
+  margin-top: 16px;
 }
 
 .modpack-list--empty {
@@ -10,6 +14,7 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
+  margin-top: 16px;
 }
 
 .modpack-list__empty {

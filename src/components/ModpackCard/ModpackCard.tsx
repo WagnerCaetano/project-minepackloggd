@@ -9,16 +9,38 @@ interface ModpackCardProps {
   onStatusChange: (id: string, status: ModpackStatus) => void;
 }
 
-const statusColors: Record<ModpackStatus, string> = {
-  'not-played': '#6b7280',
-  'in-progress': '#f59e0b',
-  'completed': '#10b981',
-};
-
-const statusLabels: Record<ModpackStatus, string> = {
-  'not-played': 'Not Played',
-  'in-progress': 'In Progress',
-  'completed': 'Completed',
+const statusConfig: Record<ModpackStatus, {
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  label: string;
+  icon: string;
+  description: string;
+}> = {
+  'not-played': {
+    color: '#9ca3af',
+    bgColor: 'rgba(107, 114, 128, 0.15)',
+    borderColor: '#6b7280',
+    label: 'Not Played',
+    icon: '⬜',
+    description: 'Haven\'t started yet',
+  },
+  'in-progress': {
+    color: '#fbbf24',
+    bgColor: 'rgba(245, 158, 11, 0.15)',
+    borderColor: '#f59e0b',
+    label: 'In Progress',
+    icon: '🎮',
+    description: 'Currently playing',
+  },
+  'completed': {
+    color: '#34d399',
+    bgColor: 'rgba(16, 185, 129, 0.15)',
+    borderColor: '#10b981',
+    label: 'Completed',
+    icon: '✅',
+    description: 'Finished playing',
+  },
 };
 
 export const ModpackCard: React.FC<ModpackCardProps> = ({
@@ -27,8 +49,13 @@ export const ModpackCard: React.FC<ModpackCardProps> = ({
   onDelete,
   onStatusChange,
 }) => {
+  const config = statusConfig[modpack.status];
+
   return (
-    <div className="modpack-card">
+    <div
+      className="modpack-card"
+      style={{ borderLeftColor: config.borderColor }}
+    >
       <div className="modpack-card__image">
         {modpack.imageUrl ? (
           <img src={modpack.imageUrl} alt={modpack.name} />
@@ -36,14 +63,44 @@ export const ModpackCard: React.FC<ModpackCardProps> = ({
           <div className="modpack-card__placeholder">No Image</div>
         )}
         <div
-          className="modpack-card__status"
-          style={{ backgroundColor: statusColors[modpack.status] }}
-          title={statusLabels[modpack.status]}
-        />
+          className="modpack-card__status-banner"
+          style={{ backgroundColor: config.borderColor }}
+        >
+          <span className="modpack-card__status-banner-icon">{config.icon}</span>
+          <span className="modpack-card__status-banner-label">{config.label}</span>
+        </div>
       </div>
       <div className="modpack-card__content">
-        <h3 className="modpack-card__name">{modpack.name}</h3>
-        <p className="modpack-card__version">Version: {modpack.version}</p>
+        <div className="modpack-card__header">
+          <h3 className="modpack-card__name">{modpack.name}</h3>
+          <span
+            className="modpack-card__version-badge"
+            style={{
+              backgroundColor: config.bgColor,
+              color: config.color,
+              borderColor: config.borderColor,
+            }}
+          >
+            v{modpack.version}
+          </span>
+        </div>
+
+        <div
+          className="modpack-card__status-detail"
+          style={{
+            backgroundColor: config.bgColor,
+            borderLeftColor: config.borderColor,
+          }}
+        >
+          <span className="modpack-card__status-detail-icon">{config.icon}</span>
+          <div className="modpack-card__status-detail-info">
+            <span className="modpack-card__status-detail-label" style={{ color: config.color }}>
+              {config.label}
+            </span>
+            <span className="modpack-card__status-detail-desc">{config.description}</span>
+          </div>
+        </div>
+
         <p className="modpack-card__description">{modpack.description}</p>
         {modpack.categories.length > 0 && (
           <div className="modpack-card__categories">
@@ -58,10 +115,11 @@ export const ModpackCard: React.FC<ModpackCardProps> = ({
           value={modpack.status}
           onChange={(e) => onStatusChange(modpack.id, e.target.value as ModpackStatus)}
           className="modpack-card__status-select"
+          style={{ borderColor: config.borderColor }}
         >
-          <option value="not-played">Not Played</option>
-          <option value="in-progress">In Progress</option>
-          <option value="completed">Completed</option>
+          <option value="not-played">⬜ Not Played</option>
+          <option value="in-progress">🎮 In Progress</option>
+          <option value="completed">✅ Completed</option>
         </select>
         <button
           onClick={() => onEdit(modpack)}

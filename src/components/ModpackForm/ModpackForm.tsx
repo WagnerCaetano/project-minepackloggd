@@ -28,6 +28,7 @@ export const ModpackForm: React.FC<ModpackFormProps> = ({ onSubmit, onCancel, in
     categories: initialData?.categories || [],
     status: initialData?.status || 'not-played' as ModpackStatus,
   });
+  const [newCategory, setNewCategory] = useState('');
 
   const performSearch = useCallback(async (query: string) => {
     if (query.trim().length < 2) {
@@ -265,16 +266,71 @@ export const ModpackForm: React.FC<ModpackFormProps> = ({ onSubmit, onCancel, in
               />
             </div>
 
-            {formData.categories.length > 0 && (
-              <div className="modpack-form__field">
-                <label>Categories</label>
+            <div className="modpack-form__field">
+              <label>Categories</label>
+              <div className="modpack-form__categories-input-row">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Type a category and press Enter"
+                  className="modpack-form__input modpack-form__category-input"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const trimmed = newCategory.trim();
+                      if (trimmed && !formData.categories.includes(trimmed)) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          categories: [...prev.categories, trimmed],
+                        }));
+                      }
+                      setNewCategory('');
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  className="modpack-form__category-add-btn"
+                  onClick={() => {
+                    const trimmed = newCategory.trim();
+                    if (trimmed && !formData.categories.includes(trimmed)) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        categories: [...prev.categories, trimmed],
+                      }));
+                    }
+                    setNewCategory('');
+                  }}
+                  disabled={!newCategory.trim()}
+                >
+                  +
+                </button>
+              </div>
+              <span className="modpack-form__hint">Press Enter or click + to add a category</span>
+              {formData.categories.length > 0 && (
                 <div className="modpack-form__categories">
                   {formData.categories.map((cat) => (
-                    <span key={cat} className="modpack-form__category-tag">{cat}</span>
+                    <span key={cat} className="modpack-form__category-tag">
+                      {cat}
+                      <button
+                        type="button"
+                        className="modpack-form__category-remove"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            categories: prev.categories.filter((c) => c !== cat),
+                          }));
+                        }}
+                        title={`Remove ${cat}`}
+                      >
+                        ×
+                      </button>
+                    </span>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="modpack-form__field">
               <label htmlFor="status">Status</label>

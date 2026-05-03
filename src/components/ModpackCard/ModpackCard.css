@@ -6,6 +6,7 @@
   transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
+  border-left: 4px solid #6b7280;
 }
 
 .modpack-card:hover {
@@ -36,15 +37,28 @@
   font-size: 14px;
 }
 
-.modpack-card__status {
+.modpack-card__status-banner {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #1f2937;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.modpack-card__status-banner-icon {
+  font-size: 12px;
+}
+
+.modpack-card__status-banner-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .modpack-card__content {
@@ -52,17 +66,66 @@
   flex: 1;
 }
 
+.modpack-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
 .modpack-card__name {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: #f3f4f6;
+  flex: 1;
+  line-height: 1.3;
 }
 
-.modpack-card__version {
-  margin: 0 0 8px 0;
-  font-size: 14px;
+.modpack-card__version-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border: 1px solid;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.modpack-card__status-detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid;
+  margin-bottom: 12px;
+}
+
+.modpack-card__status-detail-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.modpack-card__status-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.modpack-card__status-detail-label {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.modpack-card__status-detail-desc {
+  font-size: 11px;
   color: #9ca3af;
+  line-height: 1.2;
 }
 
 .modpack-card__description {
@@ -105,6 +168,7 @@
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  transition: border-color 0.2s;
 }
 
 .modpack-card__status-select:hover {
